@@ -1,0 +1,8 @@
+# reinstall cordapp for app
+
+app=$1
+
+for node in Notary PartyA PartyB; do
+    cp -a $app-contracts/build/libs/ build/nodes/$node/cordapps
+    cp -a $app-workflows/build/libs/ build/nodes/$node/cordapps
+done
