@@ -32,6 +32,19 @@ node start-up would fail.
 ### Queryable State
 `QueryableState` is a convenient feature in that it automates the process of creating new entries when new states are
 recorded. To implement it, you need to define two methods: `supportedSchema()` which tells Corda which schema this state
-will be recored in, and `generateMappedObject` which maps the State object to Entity object based on the given schema.
+will be recorded in, and `generateMappedObject` which maps the State object to Entity object based on the given schema.
 
 ### Sample Usage
+
+
+
+
+##Account
+
+###Concept
+An account is a LinearState, associated with arbitrary key-pairs certified by the host node.
+Transactions belonging to an account are signed by the node using one of the account's keys. 
+
+###Use Case
+
+###Sample Usage
