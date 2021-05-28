@@ -39,12 +39,12 @@ will be recorded in, and `generateMappedObject` which maps the State object to E
 
 
 
-##Account
+## Account
 
-###Concept
+### Concept
 An account is a LinearState, associated with arbitrary key-pairs certified by the host node.
 Transactions belonging to an account are signed by the node using one of the account's keys. 
 
-###Use Case
+### Use Case
 
-###Sample Usage
+### Sample Usage
