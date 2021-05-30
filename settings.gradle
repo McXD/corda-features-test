@@ -1,2 +1,4 @@
 include 'account-contracts'
 include 'account-workflows'
+include 'account-client'
+

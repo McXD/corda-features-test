@@ -26,7 +26,7 @@ are various tables and constraints (hence `Schema`).
 
 The way it works is that during the node start-up, Corda will read information defined in your cordapps and update
 database (migration) accordingly. Database migration currently (it seems) must be done manually by running 
-`java -jar corda.jar --run-migration-scripts --core-schemas --app-schemas --allow-hibernate-to-manage-app-schema` or else
+`java -jar corda.jar run-migration-scripts --core-schemas --app-schemas --allow-hibernate-to-manage-app-schema` or else
 node start-up would fail.
 
 ### Queryable State

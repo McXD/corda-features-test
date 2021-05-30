@@ -118,7 +118,7 @@ public class IssueIOU {
                         Arrays.asList(),
                         progressTracker.getCurrentStep().childProgressTracker()));
 
-                return iouState.toString(); // provide information about the state
+                return iouState.getLinearId().toString(); // provide information about the state
             }catch (Exception e){
                 throw new FlowException("Flow cannot finish: " + e.getMessage());
             }
@@ -146,6 +146,7 @@ public class IssueIOU {
                 @Override
                 protected void checkTransaction(@NotNull SignedTransaction stx) throws FlowException {
                     // Customized logic to verify a transaction
+                    // How to add explict party intervention
                 }
             });
 

@@ -1,4 +1,4 @@
-package com.mcxd.corda.account.client;
+package com.mcxd.corda.account.client.utils;
 
 import net.corda.client.rpc.CordaRPCClient;
 import net.corda.client.rpc.CordaRPCConnection;
@@ -30,7 +30,11 @@ public class NodeRPCConnection implements AutoCloseable {
     private int rpcPort;
 
     private CordaRPCConnection rpcConnection;
-    CordaRPCOps proxy;
+    private CordaRPCOps proxy;
+
+    public CordaRPCOps getProxy() {
+        return proxy;
+    }
 
     @PostConstruct
     public void initialiseNodeRPCConnection() {

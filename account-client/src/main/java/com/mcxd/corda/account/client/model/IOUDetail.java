@@ -1,8 +1,10 @@
-package com.mcxd.corda.account.workflows.model;
+package com.mcxd.corda.account.client.model;
 
 public class IOUDetail {
     private String borrower;
     private long amount;
+
+    public IOUDetail(){}
 
     public IOUDetail(String borrower, long amount) {
         this.borrower = borrower;

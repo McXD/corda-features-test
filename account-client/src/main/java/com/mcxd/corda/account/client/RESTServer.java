@@ -1,2 +1,11 @@
-package com.mcxd.corda.account.client;public class RESTServer {
+package com.mcxd.corda.account.client;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class RESTServer {
+    public static void main(String[] args){
+        SpringApplication.run(RESTServer.class, args);
+    }
 }

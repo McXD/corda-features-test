@@ -60,6 +60,9 @@ dependencies {
     //Account dependencies
     cordaCompile "$confidential_id_release_group:ci-workflows:$confidential_id_release_version"
     cordaCompile "$accounts_release_group:accounts-workflows:$accounts_release_version"
+
+    //Hashing
+    implementation("com.google.guava:guava:30.1.1-jre")
 }
 
 task integrationTest(type: Test, dependsOn: []) {
