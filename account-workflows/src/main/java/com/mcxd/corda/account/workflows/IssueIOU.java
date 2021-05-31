@@ -7,17 +7,22 @@ import com.r3.corda.lib.accounts.contracts.states.AccountInfo;
 import com.r3.corda.lib.accounts.workflows.flows.RequestKeyForAccount;
 import com.r3.corda.lib.accounts.workflows.services.AccountService;
 import com.r3.corda.lib.accounts.workflows.services.KeyManagementBackedAccountService;
+import net.corda.core.contracts.StateAndRef;
+import net.corda.core.contracts.TransactionVerificationException;
 import net.corda.core.contracts.UniqueIdentifier;
 import net.corda.core.crypto.TransactionSignature;
 import net.corda.core.flows.*;
 import net.corda.core.identity.AnonymousParty;
-import net.corda.core.identity.PartyAndCertificate;
 import net.corda.core.transactions.SignedTransaction;
 import net.corda.core.transactions.TransactionBuilder;
+import net.corda.core.utilities.NonEmptySet;
 import net.corda.core.utilities.ProgressTracker;
 import org.jetbrains.annotations.NotNull;
+import services.ObserverService;
+import services.PendingTransaction;
 
-import java.util.Arrays;
+import java.security.PublicKey;
+import java.util.*;
 
 /*
   The flows defined in this project is 'Account-Oriented', meaning that they assume that Identities involved
@@ -66,12 +71,21 @@ public class IssueIOU {
                 AccountService accountService = getServiceHub().cordaService(KeyManagementBackedAccountService.class);
 
                 // Generate keys used for transaction
+
                 progressTracker.setCurrentStep(PREPARE_KEYS);
                 AccountInfo lenderInfo = accountService.accountInfo(this.lender).get(0).getState().getData();
                 AnonymousParty newLender = subFlow(new RequestKeyForAccount(lenderInfo));
 
                 AccountInfo borrowerInfo = accountService.accountInfo(this.borrower).get(0).getState().getData();
                 AnonymousParty newBorrower = subFlow(new RequestKeyForAccount(borrowerInfo));
+
+
+                // Release soft locks
+                getServiceHub().getVaultService().softLockRelease(
+                        super.getRunId().getUuid(),
+                                NonEmptySet.of(
+                                    accountService.accountInfo(this.lender).get(0).getRef(),
+                                    accountService.accountInfo(this.borrower).get(0).getRef()));
 
                 progressTracker.setCurrentStep(BUILD_TRANSACTION);
                 // Create IOUState
@@ -120,6 +134,7 @@ public class IssueIOU {
 
                 return iouState.getLinearId().toString(); // provide information about the state
             }catch (Exception e){
+                e.printStackTrace();
                 throw new FlowException("Flow cannot finish: " + e.getMessage());
             }
         }
@@ -147,6 +162,32 @@ public class IssueIOU {
                 protected void checkTransaction(@NotNull SignedTransaction stx) throws FlowException {
                     // Customized logic to verify a transaction
                     // How to add explict party intervention
+                    try {
+                        StateAndRef<AccountInfo> account = getServiceHub().cordaService(KeyManagementBackedAccountService.class)
+                                .accountInfo(
+                                        stx.getMissingSigners().stream().findFirst().get()
+                                );
+
+                        String forWhom = account.getState().getData().getName();
+
+//                        getServiceHub().getVaultService().softLockRelease(
+//                                super.getRunId().getUuid(),
+//                                NonEmptySet.of(account.getRef()));
+
+                        PendingTransaction transaction = new PendingTransaction(stx.getId(), forWhom, null);
+
+                        getServiceHub().cordaService(ObserverService.class).newPendingTransaction(
+                                transaction
+                        );
+
+                        try {
+                            if (!transaction.getApproved()) throw new FlowException("Transaction Rejected");
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
                 }
             });
 

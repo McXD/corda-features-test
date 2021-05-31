@@ -25,7 +25,11 @@ public class IOUUserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         try {
+            System.out.println("---------------------------------");
+            System.out.println("Getting User Info: " + username);
             String password = cordaProxy.startFlowDynamic(GetAccount.class, username).getReturnValue().get();
+            System.out.println("DONE");
+            System.out.println("---------------------------------");
 
             return new UserDetails() {
                 @Override

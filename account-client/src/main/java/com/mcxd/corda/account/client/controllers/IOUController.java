@@ -1,18 +1,19 @@
 package com.mcxd.corda.account.client.controllers;
 
-import com.mcxd.corda.account.client.model.IOUDeleteDetail;
-import com.mcxd.corda.account.client.model.IOUPaymentDetail;
-import com.mcxd.corda.account.client.model.Status;
+import com.mcxd.corda.account.client.model.*;
 import com.mcxd.corda.account.client.utils.NodeRPCConnection;
 import com.mcxd.corda.account.workflows.GetIOUsForAccount;
 import com.mcxd.corda.account.workflows.IssueIOU;
 import com.mcxd.corda.account.workflows.PayIOU;
 import com.mcxd.corda.account.workflows.RetireIOU;
+import com.mcxd.corda.account.workflows.management.flows.GetPendingTransactions;
+import com.mcxd.corda.account.workflows.management.flows.SignPendingTransaction;
 import com.mcxd.corda.account.workflows.model.IOU;
-import com.mcxd.corda.account.client.model.IOUDetail;
+import net.corda.core.crypto.SecureHash;
 import net.corda.core.messaging.CordaRPCOps;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import services.PendingTransaction;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -95,5 +96,34 @@ public class IOUController {
 
         return status;
     }
+
+    @GetMapping("/{username}/pending")
+    @PreAuthorize("authentication.principal.username==#username")
+    public List<PendingTransaction> getPendingTransaction(@PathVariable("username") String username){
+        try {
+            return cordaProxy.startFlowDynamic(GetPendingTransactions.class, username).getReturnValue().get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return Collections.emptyList();
+    }
+
+    @PostMapping("/{username}/sign/{transactionId}")
+    @PreAuthorize("authentication.principal.username==#username")
+    public Status signTransaction(@PathVariable("username") String username,
+                                  @PathVariable("transactionId") String transactionId,
+                                      @RequestBody SignatureDetail signature){
+        try {
+            return new Status(cordaProxy.startFlowDynamic(SignPendingTransaction.class,
+                    SecureHash.Companion.parse(transactionId),
+                    signature.isApproved()).getReturnValue().get());
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+
+        return new Status(false);
+    }
+
 
 }
