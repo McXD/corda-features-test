@@ -1,6 +1,7 @@
 package com.mcxd.corda.account.client.controllers;
 
 import com.mcxd.corda.account.client.model.IOUAccount;
+import com.mcxd.corda.account.client.model.Status;
 import com.mcxd.corda.account.client.utils.NodeRPCConnection;
 import com.mcxd.corda.account.workflows.management.flows.CreateAccountWithPassword;
 import net.corda.core.messaging.CordaRPCOps;
@@ -19,8 +20,16 @@ public class AccountController {
     }
 
     @PostMapping("/register")
-    public void registerAccount(@RequestBody IOUAccount newAccount) {
-        cordaProxy.startFlowDynamic(CreateAccountWithPassword.class, newAccount.getUsername(),
-                newAccount.getPassword());
+    public Status registerAccount(@RequestBody IOUAccount newAccount) {
+        Status status = new Status(false);
+        try{
+            cordaProxy.startFlowDynamic(CreateAccountWithPassword.class, newAccount.getUsername(),
+                    newAccount.getPassword());
+            status.setSuccess(true);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        return status;
     }
 }
