@@ -1,0 +1,19 @@
+<form [formGroup]="issueForm" (ngSubmit)="onSubmit()">
+
+    <div>
+      <label for="borrower">
+        Name
+      </label>
+      <input id="borrower" type="text" formControlName="borrower">
+    </div>
+  
+    <div>
+      <label for="amount">
+        amount
+      </label>
+      <input id="amount" type="amount" formControlName="amount">
+    </div>
+  
+    <button class="button" type="submit">Issue</button>
+  
+  </form>
